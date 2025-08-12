@@ -9,6 +9,7 @@ import {
 import { unstable_matchRSCServerRequest as matchRSCServerRequest } from "react-router";
 
 import { routes } from "./routes/config";
+import { isStreamingEnabled } from "./config/streaming";
 
 function fetchServer(request: Request) {
   return matchRSCServerRequest({
@@ -24,6 +25,7 @@ function fetchServer(request: Request) {
     routes: routes(),
     // Encode the match with the React Server implementation.
     generateResponse(match, options) {
+      console.log('rsc generateResponse')
       return new Response(renderToReadableStream(match.payload, options), {
         status: match.statusCode,
         headers: match.headers,
@@ -33,12 +35,24 @@ function fetchServer(request: Request) {
 }
 
 export default async function handler(request: Request) {
-  // Import the generateHTML function from the client environment
   const ssr = await import.meta.viteRsc.loadModule<
     typeof import("./entry.ssr")
   >("ssr", "index");
 
-  return ssr.generateHTML(request, fetchServer);
+  const result = await ssr.generateHTML(request, fetchServer);
+
+  if (isStreamingEnabled()) {
+    return result;
+  } else {
+    // Convert the ReadableStream to HTML string for non-streaming response
+    const html = await result.text();
+    return new Response(html, {
+      status: result.status,
+      headers: {
+        'Content-Type': 'text/html'
+      }
+    });
+  }
 }
 
 if (import.meta.hot) {
