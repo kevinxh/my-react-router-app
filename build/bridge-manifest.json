@@ -1,0 +1,27 @@
+{
+  "createdAt": "2025-08-12T06:11:49.353Z",
+  "sourceStructure": {
+    "distServer": true,
+    "distClient": true,
+    "distRsc": true,
+    "distSsr": true
+  },
+  "files": {
+    "loader": "loader.js",
+    "ssr": "ssr.js",
+    "static": [
+      "assets",
+      "ico",
+      "rsc-assets"
+    ],
+    "assets": [
+      "client-CHOOa0b--BZrjtiOr.cjs",
+      "index-D3bvalEG-DsrHDtFQ.cjs",
+      "index-iWSnHh54.cjs",
+      "jsx-runtime.react-server-C1Bs0vs1-CAxYBTIC.cjs",
+      "route-2XK1uGUD-BU4DKTpU.cjs",
+      "route-D6HbxbqW-0Lfh1W5i.cjs",
+      "route-oZX6YTyf-Tz3bNXO1.cjs"
+    ]
+  }
+}
