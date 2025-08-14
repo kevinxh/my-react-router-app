@@ -655,6 +655,7 @@ Examples:
         info(`Beginning upload to ${options.cloudOrigin}`)
         const data = await client.push(bundle, options.projectSlug, options.target)
         
+        console.log('data', data)
         // Handle warnings
         const warnings = data.warnings || []
         warnings.forEach(warn)

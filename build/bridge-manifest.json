@@ -1,5 +1,5 @@
 {
-  "createdAt": "2025-08-12T06:11:49.353Z",
+  "createdAt": "2025-08-14T18:12:45.192Z",
   "sourceStructure": {
     "distServer": true,
     "distClient": true,
@@ -15,12 +15,12 @@
       "rsc-assets"
     ],
     "assets": [
-      "client-CHOOa0b--BZrjtiOr.cjs",
-      "index-D3bvalEG-DsrHDtFQ.cjs",
-      "index-iWSnHh54.cjs",
+      "client-CHOOa0b--B2apG2mc.cjs",
+      "index-BPFGko-P.cjs",
+      "index-D3bvalEG-37T8CIct.cjs",
       "jsx-runtime.react-server-C1Bs0vs1-CAxYBTIC.cjs",
       "route-2XK1uGUD-BU4DKTpU.cjs",
-      "route-D6HbxbqW-0Lfh1W5i.cjs",
+      "route-CIYiQ5BA-Cp_pIlXo.cjs",
       "route-oZX6YTyf-Tz3bNXO1.cjs"
     ]
   }

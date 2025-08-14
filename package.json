@@ -10,8 +10,7 @@
     "start": "cross-env NODE_ENV=production node server.js",
     "typecheck": "tsc --noEmit",
     "bridge": "node bridge.cjs",
-    "push": "node upload.cjs",
-    "deploy": "npm run build:all && npm run bridge && npm run push"
+    "push": "node upload.cjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.864.0",

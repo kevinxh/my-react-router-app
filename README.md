@@ -1,3 +1,13 @@
+# Kevin's experiement app
+
+This is a Vite + React Router v7 RSC application.
+
+The goal for this repo is to configure vite and produce a build that is compatible on MRT production environment.
+
+```sh
+npm run build:all && npm run bridge && npm run push -- -s scaffold-pwa -m "test react router vite bundle"
+```
+
 # Welcome to React Router! (Experimental RSC)
 
 ⚠️ **EXPERIMENTAL**: This template demonstrates React Server Components with React Router. This is experimental technology and not recommended for production use.

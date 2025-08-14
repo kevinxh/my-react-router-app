@@ -34798,7 +34798,7 @@ function routes() {
     {
       id: "root",
       path: "",
-      lazy: () => Promise.resolve().then(() => require("./assets/route-D6HbxbqW-0Lfh1W5i.cjs")),
+      lazy: () => Promise.resolve().then(() => require("./assets/route-CIYiQ5BA-Cp_pIlXo.cjs")),
       children: [
         {
           id: "home",
@@ -34837,7 +34837,7 @@ function fetchServer(request2) {
   });
 }
 async function handler$1(request2) {
-  const ssr = await Promise.resolve().then(() => require("./assets/index-iWSnHh54.cjs"));
+  const ssr = await Promise.resolve().then(() => require("./assets/index-BPFGko-P.cjs"));
   const result = await ssr.generateHTML(request2, fetchServer);
   {
     const html = await result.text();
