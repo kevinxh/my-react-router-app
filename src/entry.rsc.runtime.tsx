@@ -14,6 +14,9 @@ import { createRequestListener } from "@remix-run/node-fetch-server";
 import { routes } from "./routes/config";
 import { isStreamingEnabled } from "./config/streaming";
 
+// HACKY! IMPORTANT!
+// this global is used in the vite-rsc build artifact files __vite_rsc_assets_manifest to get the correct asset url
+// it is set in the vite.config.ts file
 global.__getAssetUrl = (filename: string) => {
   console.log('global getAssetUrl called with filename:', filename)
   
