@@ -8,7 +8,6 @@ import {
 } from "@vitejs/plugin-rsc/rsc";
 import { unstable_matchRSCServerRequest as matchRSCServerRequest } from "react-router";
 import awsServerlessExpress from "aws-serverless-express";
-import compression from "compression";
 import express from "express";
 import { createRequestListener } from "@remix-run/node-fetch-server";
 
@@ -16,45 +15,92 @@ import { routes } from "./routes/config";
 import { isStreamingEnabled } from "./config/streaming";
 
 function fetchServer(request: Request) {
-  return matchRSCServerRequest({
-    // Provide the React Server touchpoints.
-    createTemporaryReferenceSet,
-    decodeAction,
-    decodeFormState,
-    decodeReply,
-    loadServerAction,
-    // The incoming request.
-    request,
-    // The app routes.
-    routes: routes(),
-    // Encode the match with the React Server implementation.
-    generateResponse(match, options) {
-      console.log('rsc generateResponse')
-      return new Response(renderToReadableStream(match.payload, options), {
-        status: match.statusCode,
-        headers: match.headers,
-      });
-    },
+  console.log('fetchServer called with request:', {
+    url: request.url,
+    method: request.method
   });
+  
+  try {
+    const result = matchRSCServerRequest({
+      // Provide the React Server touchpoints.
+      createTemporaryReferenceSet,
+      decodeAction,
+      decodeFormState,
+      decodeReply,
+      loadServerAction,
+      // The incoming request.
+      request,
+      // The app routes.
+      routes: routes(),
+      // Encode the match with the React Server implementation.
+      generateResponse(match, options) {
+        console.log('rsc generateResponse called:', {
+          statusCode: match.statusCode,
+          headers: Object.fromEntries(match.headers.entries()),
+          payloadType: typeof match.payload
+        });
+        
+        const response = new Response(renderToReadableStream(match.payload, options), {
+          status: match.statusCode,
+          headers: match.headers,
+        });
+        console.log('rsc response created');
+        return response;
+      },
+    });
+    console.log('matchRSCServerRequest completed successfully');
+    return result;
+  } catch (error) {
+    console.error('fetchServer error:', error);
+    throw error;
+  }
 }
 
 // must export a default handler function for  @vitejs/plugin-rsc 's dev server to work
 export default async function handler(request: Request) {
-  const ssr = await import.meta.viteRsc.loadModule<
-    typeof import("./entry.ssr")
-  >("ssr", "index");
+  console.log('Handler called with request:', {
+    url: request.url,
+    method: request.method,
+    headers: Object.fromEntries(request.headers.entries())
+  });
 
-  const result = await ssr.generateHTML(request, fetchServer);
+  try {
+    const ssr = await import.meta.viteRsc.loadModule<
+      typeof import("./entry.ssr")
+    >("ssr", "index");
+    console.log('SSR module loaded successfully');
 
-  if (isStreamingEnabled()) {
-    return result;
-  } else {
-    // Convert the ReadableStream to HTML string for non-streaming response
-    const html = await result.text();
-    return new Response(html, {
+    const result = await ssr.generateHTML(request, fetchServer);
+    console.log('generateHTML result:', {
       status: result.status,
+      headers: Object.fromEntries(result.headers.entries()),
+      streamingEnabled: isStreamingEnabled()
+    });
+
+    if (isStreamingEnabled()) {
+      console.log('Returning streaming response');
+      return result;
+    } else {
+      // Convert the ReadableStream to HTML string for non-streaming response
+      console.log('Converting stream to HTML string');
+      const html = await result.text();
+      console.log('HTML generated, length:', html.length);
+      
+      const response = new Response(html, {
+        status: result.status,
+        headers: {
+          'Content-Type': 'text/html'
+        }
+      });
+      console.log('Non-streaming response created');
+      return response;
+    }
+  } catch (error) {
+    console.error('Handler error:', error);
+    return new Response('Internal Server Error', {
+      status: 500,
       headers: {
-        'Content-Type': 'text/html'
+        'Content-Type': 'text/plain'
       }
     });
   }
@@ -64,13 +110,12 @@ const app = express();
 
 app.use(
   "/assets",
-  compression(),
   express.static("dist/client/assets", {
     immutable: true,
     maxAge: "1y",
   }),
 );
-app.use(compression(), express.static("dist/client"));
+app.use(express.static("dist/client"));
 
 app.get("/.well-known/appspecific/com.chrome.devtools.json", (_, res) => {
   res.status(404);
@@ -84,15 +129,55 @@ const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video
 const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes);
 
 const lambdaHandler = (event, context, callback) => {
+  console.log('Lambda handler invoked:', {
+    event: JSON.stringify(event, null, 2),
+    context: {
+      functionName: context.functionName,
+      functionVersion: context.functionVersion,
+      invokedFunctionArn: context.invokedFunctionArn,
+      awsRequestId: context.awsRequestId,
+      remainingTimeInMillis: context.getRemainingTimeInMillis()
+    }
+  });
+  
   context.callbackWaitsForEmptyEventLoop = false;
   
-  awsServerlessExpress.proxy(
-    server,
-    event,
-    context,
-    'CALLBACK',
-    callback
-  );
+  try {
+    awsServerlessExpress.proxy(
+      server,
+      event,
+      context,
+      'CALLBACK',
+      (error, result) => {
+        console.log('awsServerlessExpress callback:', {
+          error: error ? error.message : null,
+          result: result ? {
+            statusCode: result.statusCode,
+            headers: result.headers,
+            bodyLength: result.body ? result.body.length : 0,
+            isBase64Encoded: result.isBase64Encoded,
+            bodyPreview: result.body ? result.body.substring(0, 200) : null
+          } : null
+        });
+        
+        // Log the exact callback being made
+        console.log('Calling Lambda callback with:', {
+          errorPresent: !!error,
+          resultPresent: !!result,
+          resultType: typeof result,
+          isBase64Encoded: result?.isBase64Encoded
+        });
+        
+        callback(error, result);
+        
+        console.log('Lambda callback completed');
+      }
+    );
+  } catch (error) {
+    console.error('Lambda handler error:', error);
+    console.log('Calling callback with error');
+    callback(error);
+  }
 };
 
 export const get = lambdaHandler;
