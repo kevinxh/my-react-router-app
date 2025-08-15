@@ -105,7 +105,7 @@ const chalk = require('chalk')
 
 // Configuration
 const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
-const DEFAULT_BUILD_DIR = path.join(process.cwd(), 'build')
+const DEFAULT_BUILD_DIR = path.join(process.cwd(), 'dist')
 
 // Utility functions for colored output
 const colors = {
@@ -628,20 +628,30 @@ Examples:
         const bundle = await createBundle({
             message: options.message,
             ssr_parameters: config.ssrParameters || {
-                ssrFunctionNodeVersion: '22.x',
-                proxyConfigs: [
-                    {
-                        host: 'kv7kzm78.api.commercecloud.salesforce.com',
-                        path: 'api'
-                    },
-                    {
-                        host: 'zzrf-001.dx.commercecloud.salesforce.com',
-                        path: 'ocapi'
-                    }
-                ]
+                ssrFunctionNodeVersion: '22.x'
             },
-            ssr_only: config.ssrOnly || ['**/*'],
-            ssr_shared: config.ssrShared || ['**/*'],
+            ssr_only: config.ssrOnly || [
+                "**/*.js",
+                "**/*.cjs", 
+                "**/*.json",
+                "loader.js",
+                "ssr.js",
+                "!static/**/*"
+            ],
+            ssr_shared: config.ssrShared || [
+                "static/**/*",
+                "**/*.css",
+                "**/*.png", 
+                "**/*.jpg",
+                "**/*.jpeg",
+                "**/*.gif",
+                "**/*.svg",
+                "**/*.ico",
+                "**/*.woff",
+                "**/*.woff2",
+                "**/*.ttf",
+                "**/*.eot"
+            ],
             buildDirectory: options.buildDirectory,
             projectSlug: options.projectSlug
         })

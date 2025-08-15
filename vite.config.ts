@@ -11,10 +11,50 @@ export default defineConfig({
     rsc({
       entries: {
         client: "src/entry.browser.tsx",
-        rsc: "src/entry.rsc.tsx",
+        rsc: "src/entry.rsc.runtime.tsx",
         ssr: "src/entry.ssr.tsx",
       },
     }),
     devtoolsJson(),
   ],
+  environments: {
+    rsc: {
+      build: {
+        rollupOptions: {
+          output: {
+            format: "cjs",
+            exports: "named",
+            entryFileNames: "[name].js",
+            chunkFileNames: "assets/[name]-[hash].js",
+          },
+          external: (id) => {
+            // Keep Node.js built-ins external
+            return /^(node:|fs|path|url|crypto|stream|util|events|buffer|os|http|https|querystring|zlib)$/.test(id);
+          },
+        },
+      },
+      resolve: {
+        noExternal: /^(?!node:)/,
+      },
+    },
+    ssr: {
+      build: {
+        rollupOptions: {
+          output: {
+            format: "cjs",
+            exports: "named",
+            entryFileNames: "[name].js",
+            chunkFileNames: "assets/[name]-[hash].js",
+          },
+          external: (id) => {
+            // Keep Node.js built-ins external
+            return /^(node:|fs|path|url|crypto|stream|util|events|buffer|os|http|https|querystring|zlib)$/.test(id);
+          },
+        },
+      },
+      resolve: {
+        noExternal: /^(?!node:)/,
+      },
+    },
+  },
 });
