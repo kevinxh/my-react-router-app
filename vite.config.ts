@@ -5,6 +5,26 @@ import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
 
 export default defineConfig({
+  experimental: {
+    renderBuiltUrl(filename, { type }) {
+      console.log('renderBuiltUrl: filename', filename)
+      if (type === 'asset') {
+        // if (process.env.BUNDLE_ID) {
+        //   console.log('renderBuiltUrl: BUNDLE_ID', process.env.BUNDLE_ID)
+        //   return {runtime: `callsomething(${process.env.BUNDLE_ID}/${filename})`}
+        // }
+
+        // if (typeof window !== 'undefined') {
+        //   console.log('renderBuiltUrl: window.__pwa_kit_vite', window.__pwa_kit_vite)
+        //   return {runtime: `callsomething(${filename})`}
+        // }
+
+        return {runtime: `__getAssetUrl("${filename}")`}
+
+      }
+      return { relative: true }
+    },
+  },
   plugins: [
     tailwindcss(),
     react(),

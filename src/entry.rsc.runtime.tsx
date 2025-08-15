@@ -14,6 +14,12 @@ import { createRequestListener } from "@remix-run/node-fetch-server";
 import { routes } from "./routes/config";
 import { isStreamingEnabled } from "./config/streaming";
 
+global.__getAssetUrl = (filename: string) => {
+  console.log('global getAssetUrl called with filename:', filename)
+  
+  return `/mobify/bundle/${process.env.BUNDLE_ID}/${filename}`
+}
+
 function fetchServer(request: Request) {
   console.log('fetchServer called with request:', {
     url: request.url,
@@ -58,11 +64,6 @@ function fetchServer(request: Request) {
 
 // must export a default handler function for  @vitejs/plugin-rsc 's dev server to work
 export default async function handler(request: Request) {
-  console.log('Handler called with request:', {
-    url: request.url,
-    method: request.method,
-    headers: Object.fromEntries(request.headers.entries())
-  });
 
   try {
     const ssr = await import.meta.viteRsc.loadModule<
@@ -129,17 +130,6 @@ const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video
 const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes);
 
 const lambdaHandler = (event, context, callback) => {
-  console.log('Lambda handler invoked:', {
-    event: JSON.stringify(event, null, 2),
-    context: {
-      functionName: context.functionName,
-      functionVersion: context.functionVersion,
-      invokedFunctionArn: context.invokedFunctionArn,
-      awsRequestId: context.awsRequestId,
-      remainingTimeInMillis: context.getRemainingTimeInMillis()
-    }
-  });
-  
   context.callbackWaitsForEmptyEventLoop = false;
   
   try {

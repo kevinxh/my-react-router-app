@@ -485,6 +485,32 @@ const getDefaultMessage = () => {
     }
 }
 
+// Function to dynamically get files from a directory
+const getFilesFromDirectory = (dirPath, buildDirectory) => {
+    if (!fs.existsSync(dirPath)) {
+        return []
+    }
+    
+    const files = []
+    const walkDirectory = (currentPath, basePath) => {
+        const entries = fs.readdirSync(currentPath, { withFileTypes: true })
+        
+        entries.forEach(entry => {
+            const fullPath = path.join(currentPath, entry.name)
+            if (entry.isDirectory()) {
+                walkDirectory(fullPath, basePath)
+            } else {
+                // Get relative path from the build directory
+                const relativePath = path.relative(basePath, fullPath)
+                files.push(relativePath)
+            }
+        })
+    }
+    
+    walkDirectory(dirPath, buildDirectory)
+    return files
+}
+
 // Main function
 async function main() {
     // Parse command line arguments
@@ -624,34 +650,53 @@ Examples:
         
         info(`Creating bundle for project: ${options.projectSlug}`)
         
+        // Get dynamic file lists
+        const assetsDir = path.join(options.buildDirectory, 'assets')
+        const ssrDir = path.join(options.buildDirectory, 'ssr')
+        const rscDir = path.join(options.buildDirectory, 'rsc')
+        
+        const assetsFiles = getFilesFromDirectory(assetsDir, options.buildDirectory)
+        const ssrFiles = getFilesFromDirectory(ssrDir, options.buildDirectory)
+        const rscFiles = getFilesFromDirectory(rscDir, options.buildDirectory)
+        
+        // Create dynamic ssr_shared array (existing + assets files)
+        const defaultSsrShared = [
+            "static/**/*",
+            "**/*.css",
+            "**/*.png", 
+            "**/*.jpg",
+            "**/*.jpeg",
+            "**/*.gif",
+            "**/*.svg",
+            "**/*.ico",
+            "**/*.woff",
+            "**/*.woff2",
+            "**/*.ttf",
+            "**/*.eot"
+        ]
+        const dynamicSsrShared = [...defaultSsrShared, ...assetsFiles, ...rscFiles]
+        
+        // Create dynamic ssr_only array (existing + ssr files)
+        const defaultSsrOnly = [
+            "loader.js",
+            "ssr.js",
+            "rsc/index.js",
+            "!static/**/*"
+        ]
+        const dynamicSsrOnly = [...defaultSsrOnly, ...ssrFiles, ...rscFiles]
+        
+        // Console log the arrays
+        console.log('ssr_shared array:', dynamicSsrShared)
+        console.log('ssr_only array:', dynamicSsrOnly)
+        
         // Create bundle
         const bundle = await createBundle({
             message: options.message,
             ssr_parameters: config.ssrParameters || {
                 ssrFunctionNodeVersion: '22.x'
             },
-            ssr_only: config.ssrOnly || [
-                "**/*.js",
-                "**/*.cjs", 
-                "**/*.json",
-                "loader.js",
-                "ssr.js",
-                "!static/**/*"
-            ],
-            ssr_shared: config.ssrShared || [
-                "static/**/*",
-                "**/*.css",
-                "**/*.png", 
-                "**/*.jpg",
-                "**/*.jpeg",
-                "**/*.gif",
-                "**/*.svg",
-                "**/*.ico",
-                "**/*.woff",
-                "**/*.woff2",
-                "**/*.ttf",
-                "**/*.eot"
-            ],
+            ssr_only: config.ssrOnly || dynamicSsrOnly,
+            ssr_shared: config.ssrShared || dynamicSsrShared,
             buildDirectory: options.buildDirectory,
             projectSlug: options.projectSlug
         })

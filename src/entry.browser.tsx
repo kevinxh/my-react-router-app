@@ -50,3 +50,8 @@ if (import.meta.hot) {
     (window as unknown as { __router: DataRouter }).__router.revalidate();
   });
 }
+
+// window.__getAssetUrl = (filename: string) => {
+//   console.log('__getAssetUrl called with filename:', filename);
+//   return `/assets/${filename}`;
+// };

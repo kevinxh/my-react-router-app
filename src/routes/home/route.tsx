@@ -3,16 +3,16 @@ import { isStreamingEnabled } from "../../config/streaming";
 
 // Async component that simulates slow data fetching
 async function SlowServerData() {
-  // Simulate server-side data fetching with 5 second delay
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  // Simulate server-side data fetching with 0.5 second delay
+  await new Promise(resolve => setTimeout(resolve, 500));
   
   const serverTime = new Date().toLocaleString();
   
   return (
     <div className="bg-blue-50 p-4 rounded border">
-      <h3>Server Data (loaded after 5s)</h3>
+      <h3>Server Data (loaded after 0.5s)</h3>
       <p><strong>Server time:</strong> {serverTime}</p>
-      <p><em>This component took 5 seconds to load on the server.</em></p>
+      <p><em>This component took 0.5 seconds to load on the server.</em></p>
     </div>
   );
 }

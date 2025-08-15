@@ -21,6 +21,7 @@ export async function generateHTML(
     // Render the router to HTML.
     async renderHTML(getPayload) {
       console.log('ssr renderHTML')
+      console.log('process.env.BUNDLE_ID', process.env.BUNDLE_ID)
       const payload = await getPayload();
       const formState =
         payload.type === "render" ? await payload.formState : undefined;
@@ -29,7 +30,15 @@ export async function generateHTML(
         await import.meta.viteRsc.loadBootstrapScriptContent("index");
 
         return await renderHTMLToReadableStream(
-          <RSCStaticRouter getPayload={getPayload} />,
+          <>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.__pwa_kit_vite = ${JSON.stringify({ bundleId: process.env.BUNDLE_ID })};`,
+            }}
+          />
+          <RSCStaticRouter getPayload={getPayload} />
+
+          </>,
           {
             bootstrapScriptContent,
             // @ts-expect-error - no types for this yet

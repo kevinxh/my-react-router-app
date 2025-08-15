@@ -28,6 +28,28 @@ async function createBridgeStructure() {
 module.exports = require('./rsc/index.js');`;
     await fs.writeFile(path.join(distDir, 'ssr.js'), ssrContent);
     
+    // Copy assets to root assets folder
+    console.log('📁 Copying assets to root assets folder...');
+    const rootAssetsDir = path.join(distDir, 'assets');
+    await fs.ensureDir(rootAssetsDir);
+    
+
+    // NOTE: never copy the ssr/assets because they should never be served to the public
+    const assetDirs = ['client/assets', 'rsc/assets'];
+    
+    for (const assetDir of assetDirs) {
+        const sourceDir = path.join(distDir, assetDir);
+        if (await fs.pathExists(sourceDir)) {
+            const files = await fs.readdir(sourceDir);
+            for (const file of files) {
+                const sourcePath = path.join(sourceDir, file);
+                const destPath = path.join(rootAssetsDir, file);
+                await fs.copy(sourcePath, destPath, { overwrite: true });
+                console.log(`   ✓ Copied ${assetDir}/${file} to assets/${file}`);
+            }
+        }
+    }
+    
     // Fix assets manifest files to use CommonJS format
     console.log('🔧 Converting assets manifest files to CommonJS...');
     const manifestFiles = [
