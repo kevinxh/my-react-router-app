@@ -1,7 +1,6 @@
 {
   "name": "my-react-router-app",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "vite build",
     "build:server": "vite build --config vite.server.config.ts",
@@ -11,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "bridge": "node bridge.cjs",
     "push": "node upload.cjs",
-    "deploy": "npm run build:all && npm run bridge && npm run push"
+    "tail-logs": "npx @salesforce/pwa-kit-dev@latest tail-logs --project scaffold-pwa --environment kev"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.864.0",

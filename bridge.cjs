@@ -15,12 +15,14 @@ async function createBridgeStructure() {
     
     // Copy package.json (required by upload.js)
     const packageJson = await fs.readJson('package.json');
+    // IMPORTANT: Remove "type": "module" to ensure CommonJS compatibility
+    delete packageJson.type;
     await fs.writeJson(path.join(buildDir, 'package.json'), packageJson, { spaces: 2 });
     
     // Copy the main SSR bundle (dist/server/ssr.cjs -> build/ssr.js)
     console.log('📦 Copying SSR bundle...');
     await fs.copy(
-        path.join(distDir, 'server', 'ssr.cjs'),
+        path.join(distDir, 'server', 'ssr.js'),
         path.join(buildDir, 'ssr.js')
     );
     

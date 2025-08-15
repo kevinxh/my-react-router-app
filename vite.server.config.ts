@@ -9,7 +9,7 @@ export default defineConfig({
       input: "ssr.js",
       output: {
         format: "cjs",
-        entryFileNames: "ssr.cjs",
+        entryFileNames: "ssr.js",
       },
       external: [
         // Keep these as external since they'll be in Lambda layers or node_modules

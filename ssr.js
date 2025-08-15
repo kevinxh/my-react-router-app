@@ -1,4 +1,3 @@
-import "@aws-sdk/client-s3";
 import awsServerlessExpress from "aws-serverless-express";
 import app from "./app.js";
 

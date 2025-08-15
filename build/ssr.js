@@ -34798,17 +34798,17 @@ function routes() {
     {
       id: "root",
       path: "",
-      lazy: () => Promise.resolve().then(() => require("./assets/route-CIYiQ5BA-Cp_pIlXo.cjs")),
+      lazy: () => Promise.resolve().then(() => require("./assets/route-B_Majrph-gx7sY_6h.cjs")),
       children: [
         {
           id: "home",
           index: true,
-          lazy: () => Promise.resolve().then(() => require("./assets/route-oZX6YTyf-Tz3bNXO1.cjs"))
+          lazy: () => Promise.resolve().then(() => require("./assets/route-oZX6YTyf-MwaxE-Ay.cjs"))
         },
         {
           id: "about",
           path: "about",
-          lazy: () => Promise.resolve().then(() => require("./assets/route-2XK1uGUD-BU4DKTpU.cjs"))
+          lazy: () => Promise.resolve().then(() => require("./assets/route-2XK1uGUD-BpCX_Efa.cjs"))
         }
       ]
     }
@@ -34837,7 +34837,7 @@ function fetchServer(request2) {
   });
 }
 async function handler$1(request2) {
-  const ssr = await Promise.resolve().then(() => require("./assets/index-BPFGko-P.cjs"));
+  const ssr = await Promise.resolve().then(() => require("./assets/index-f-pvGGhT.cjs"));
   const result = await ssr.generateHTML(request2, fetchServer);
   {
     const html = await result.text();

@@ -10,10 +10,10 @@
     "start": "cross-env NODE_ENV=production node server.js",
     "typecheck": "tsc --noEmit",
     "bridge": "node bridge.cjs",
-    "push": "node upload.cjs"
+    "push": "node upload.cjs",
+    "tail-logs": "npx @salesforce/pwa-kit-dev@latest tail-logs --project scaffold-pwa --environment kev"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.864.0",
     "@remix-run/node-fetch-server": "0.8.0",
     "aws-sdk": "^2.1692.0",
     "aws-serverless-express": "^3.4.0",
